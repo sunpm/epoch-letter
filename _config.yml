@@ -1,0 +1,13 @@
+title: 未来胶囊
+description: 展示我的个人胶囊
+lang: zh-CN
+timezone: Asia/Shanghai
+
+# 使用 GitHub Pages 官方主题（无需本地安装 Ruby）
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# 保留原始文件结构
+collections: []
+markdown: kramdown

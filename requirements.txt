@@ -1,0 +1,3 @@
+pyyaml==6.0.2
+resend==2.12.0
+python-dotenv==1.1.1

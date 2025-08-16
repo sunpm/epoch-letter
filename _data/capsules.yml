@@ -1,0 +1,11 @@
+- content: "你好，世界！
+
+    这是我的第一个时间胶囊测试。
+
+    "
+  delivery_date: "2025-08-11"
+  display_on_fork: false
+  email: test@gmail.com
+  id: 1
+  status: scheduled
+  subject: 一封测试邮件

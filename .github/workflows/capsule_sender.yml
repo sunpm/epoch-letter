@@ -1,0 +1,68 @@
+name: "未来胶囊 - 定时发送服务"
+
+on:
+  # 允许你手动在GitHub页面的Actions标签下触发这个工作流，方便测试
+  workflow_dispatch:
+  # 设定一个定时器，使用CRON表达式
+  # 这里的 '0 8 * * *' 表示每天UTC时间早上8点运行一次
+  schedule:
+    - cron: "0 8 * * *"
+  # 当推送包含数据或脚本变更时自动触发（例如新增/修改胶囊）
+  push:
+    branches: [main, master] # 支持 main 和 master 分支
+    paths:
+      - "_data/capsules.yml"
+      - "scripts/send_email.py"
+  # 当通过网页端直接编辑文件时也会触发
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "_data/capsules.yml"
+      - "scripts/send_email.py"
+
+# 为工作流授予权限，使其能够将修改后的状态文件提交回仓库
+permissions:
+  contents: write
+
+jobs:
+  send_scheduled_capsules:
+    runs-on: ubuntu-latest # 使用最新的Ubuntu虚拟机环境
+
+    steps:
+      # 第一步：检出你的代码
+      # 让工作流可以访问你的仓库文件
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 第二步：设置Python环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11" # 指定Python版本，和项目一致
+
+      # 第三步：安装Python依赖
+      # 从 requirements.txt 文件中安装我们需要的库
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 第四步：运行邮件发送脚本
+      # 最关键的一步，执行我们的Python逻辑
+      - name: Run send email script
+        env:
+          # 将你在GitHub Secrets中设置的API Key注入到环境变量中
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
+        run: python scripts/send_email.py
+
+      # 第五步：自动提交状态更新
+      # 如果Python脚本修改了capsules.yml文件，这一步会把它提交回你的仓库
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name '未来胶囊 Bot'
+          git config --global user.email 'actions@github.com'
+          git add _data/capsules.yml
+          # 如果没有文件变动，git commit会失败，我们用`|| exit 0`来忽略这个错误
+          git commit -m "chore: 更新胶囊状态" || exit 0
+          git push
