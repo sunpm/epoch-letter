@@ -4,7 +4,7 @@
 
     '
   delivery_date: '2025-08-11'
-  display_on_fork: false
+  display_on_fork: true
   email: test@gmail.com
   id: 1
   status: sent
